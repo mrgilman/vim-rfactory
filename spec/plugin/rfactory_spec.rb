@@ -38,16 +38,22 @@ describe 'Rfactory' do
       expect(current_path).to eq 'user_spec.rb'
     end
 
-    it 'uses the factory location override if present' do
+    it 'finds the factory file anywher under spec/ directory' do
       create_factories_file 'spec/support'
       edit_spec_file_with_text
 
-      with_factory_file_location("spec/support/factories.rb") do
-        vim.command 'Rfactory'
+      vim.command 'Rfactory'
 
-        expect(current_path).to eq 'spec/support/factories.rb'
-        expect(current_line).to eq 'factory :user do'
-      end
+      expect(current_path).to eq 'spec/support/factories.rb'
+      expect(current_line).to eq 'factory :user do'
+    end
+
+    it 'does nothing if no factories.rb file is present in spec/ dir' do
+      spec_file = create_spec_file('user = create(:user)')
+
+      vim.edit spec_file
+
+      expect { vim.command 'Rfactory' }.not_to change { current_path }
     end
   end
 
